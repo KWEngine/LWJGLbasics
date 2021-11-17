@@ -3,6 +3,7 @@ package de.openglapp.scene;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.openglapp.helper.HelperMatrix;
+import de.openglapp.helper.HelperTexture;
 
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Matrix4f;
@@ -11,8 +12,9 @@ public class GameObject {
 	private Vector3f _position = new Vector3f(0,0,0);
 	private Quaternion _rotation = new Quaternion(0,0,0,1);
 	private Vector3f _scale = new Vector3f(1,1,1);
-	
+	private int _textureId = -1;
 	private Matrix4f _modelMatrix = new Matrix4f();
+	
 	
 	public void updateModelMatrix()
 	{
@@ -36,5 +38,15 @@ public class GameObject {
 		_scale.x = x;
 		_scale.y = y;
 		_scale.z = z; // in 2D, z SHOULD be 1 every time!
+	}
+	
+	public void SetTexture(String filename)
+	{
+		_textureId = HelperTexture.importTexture(filename);
+	}
+	
+	public int GetTexture()
+	{
+		return _textureId;
 	}
 }

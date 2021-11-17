@@ -6,9 +6,10 @@ in vec2 vTextureCoordinates;
 in vec3 vNormal;
 
 uniform sampler2D uTexture;
+uniform vec3 uColor;
 
 void main()
 {
-	vec3 textureColor = texture(uTexture, vTextureCoordinates).xyz;
+	vec3 textureColor = texture(uTexture, vTextureCoordinates).xyz * uColor;
 	pixelColor = vec4(textureColor, 1.0);
 }

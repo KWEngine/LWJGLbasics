@@ -4,8 +4,11 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
+import org.lwjgl.util.vector.Matrix4f;
 
+import de.openglapp.geometry.Rectangle;
 import de.openglapp.helper.HelperTexture;
+import de.openglapp.scene.GameObject;
 import de.openglapp.scene.Scene;
 import de.openglapp.shaderprogram.ShaderProgramMain;
 
@@ -20,6 +23,9 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class GameWindow {
 
 	private long window;
+	private int windowWidth;
+	private int windowHeight;
+	private Matrix4f _viewProjectionMatrix = new Matrix4f();
 	
 	public static void main(String[] args) {
 		new GameWindow().run();
@@ -52,7 +58,7 @@ public class GameWindow {
 		// Configure GL for Windows (GLFW)
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will not be resizable (much easier to handle!)
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 
@@ -74,6 +80,8 @@ public class GameWindow {
 
 			// Get the window size passed to glfwCreateWindow
 			glfwGetWindowSize(window, pWidth, pHeight);
+			windowWidth = pWidth.get(0);
+			windowHeight = pHeight.get(0);
 
 			// Get the resolution of the primary monitor
 			GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -108,7 +116,7 @@ public class GameWindow {
 			// clear the framebuffer (screen)
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-			ShaderProgramMain.render(s);
+			ShaderProgramMain.render(s, _viewProjectionMatrix);
 			
 			
 			
@@ -134,6 +142,8 @@ public class GameWindow {
 		ShaderProgramMain.init();
 		ShaderProgramMain.bindProgram();
 		
+		Rectangle.init();
+		
 		HelperTexture.initDefaultTexture();
 		
 	}
@@ -142,6 +152,16 @@ public class GameWindow {
 	{
 		Scene s = new Scene();
 		s.updateViewMatrix(0, 0, 1, 0, 0, 0);
+		s.updateProjectionMatrix(windowWidth, windowHeight);
+		s.updateViewProjectionMatrix(_viewProjectionMatrix);
+		
+		GameObject exampleObject = new GameObject();
+		exampleObject.setPosition(1, 0,  0);
+		exampleObject.setScale(1,  1,  1);
+		exampleObject.updateModelMatrix();
+		exampleObject.SetTexture("/textures/stone.jpg");
+		
+		s.addObject(exampleObject);
 		
 		return s;
 	}

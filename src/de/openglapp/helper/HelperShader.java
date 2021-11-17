@@ -10,8 +10,12 @@ import de.openglapp.shaderprogram.ShaderProgramMain;
 
 public class HelperShader {
 	public static String convertStreamToString(InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        boolean hasNext = s.hasNext();
+        String content = hasNext ? s.next() : "";
+        s.close();
+        
+        return content; 
     }
 
 	public static int loadShader(String filename, int shaderType, int program) {

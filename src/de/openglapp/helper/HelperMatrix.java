@@ -17,6 +17,7 @@ public final class HelperMatrix {
     private final static Matrix4f mRotZ = new Matrix4f();
     private final static Matrix4f mTrans = new Matrix4f();
     private final static Vector3f mWorldUp = new Vector3f(0, 1, 0);
+    private final static float[] mMatrix4AsFloats = new float[16];
     
 	public static FloatBuffer genFBuffer(Matrix4f m) {
         FloatBuffer result = BufferUtils.createFloatBuffer(16);
@@ -24,6 +25,53 @@ public final class HelperMatrix {
         result.flip();
         return result;
     }
+	
+	public static float[] asFloatArray(Matrix4f m)
+	{
+		mMatrix4AsFloats[0] = m.m00;
+		mMatrix4AsFloats[1] = m.m10;
+		mMatrix4AsFloats[2] = m.m20;
+		mMatrix4AsFloats[3] = m.m30;
+		
+		mMatrix4AsFloats[4] = m.m01;
+		mMatrix4AsFloats[5] = m.m11;
+		mMatrix4AsFloats[6] = m.m21;
+		mMatrix4AsFloats[7] = m.m31;
+		
+		mMatrix4AsFloats[8] = m.m02;
+		mMatrix4AsFloats[9] = m.m12;
+		mMatrix4AsFloats[10] = m.m22;
+		mMatrix4AsFloats[11] = m.m32;
+		
+		mMatrix4AsFloats[12] = m.m03;
+		mMatrix4AsFloats[13] = m.m13;
+		mMatrix4AsFloats[14] = m.m23;
+		mMatrix4AsFloats[15] = m.m33;
+		/*
+		// new try:
+		mMatrix4AsFloats[0] = m.m00;
+		mMatrix4AsFloats[1] = m.m01;
+		mMatrix4AsFloats[2] = m.m02;
+		mMatrix4AsFloats[3] = m.m03;
+		
+		mMatrix4AsFloats[4] = m.m10;
+		mMatrix4AsFloats[5] = m.m11;
+		mMatrix4AsFloats[6] = m.m12;
+		mMatrix4AsFloats[7] = m.m13;
+		
+		mMatrix4AsFloats[8] = m.m20;
+		mMatrix4AsFloats[9] = m.m21;
+		mMatrix4AsFloats[10] = m.m22;
+		mMatrix4AsFloats[11] = m.m23;
+		
+		mMatrix4AsFloats[12] = m.m30;
+		mMatrix4AsFloats[13] = m.m31;
+		mMatrix4AsFloats[14] = m.m32;
+		mMatrix4AsFloats[15] = m.m33;
+		*/
+		
+		return mMatrix4AsFloats;
+	}
 
     public static Matrix4f multiplyWithScalar(Matrix4f source, float factor){
         Matrix4f result = new Matrix4f();
@@ -110,7 +158,7 @@ public final class HelperMatrix {
         m.m01 = m.m01 * scale.y;
         m.m11 = m.m11 * scale.y;
         m.m21 = m.m21 * scale.y;
-        m.m31 = m.m31 * scale.x;
+        m.m31 = m.m31 * scale.y;
 
         // third row:
         m.m02 = m.m02 * scale.z;
@@ -124,6 +172,40 @@ public final class HelperMatrix {
         m.m23 = position.z;
         m.m33 = 1;
     }
+    
+    public static void updateOrthographicProjectionMatrix(int left, int right, int bottom, int top, float zNear, float zFar, Matrix4f result)
+    {
+    	//return;
+    	
+    	
+        float invRL = 1f / (right - left);
+        float invTB = 1f / (top - bottom);
+        float invFN = 1f / (zFar - zNear);
+
+        result.m00 = 2f * invRL;
+        result.m10 = 0;
+        result.m20 = 0;
+        result.m30 = 0;
+        
+        result.m01 = 0;
+        result.m11 = 2f * invTB;
+        result.m21 = 0;
+        result.m31 = 0;
+        
+        result.m02 = 0;
+        result.m12 = 0;
+        result.m22 = -2f * invFN;
+        result.m32 = 0;
+        
+
+        result.m03 = -(right + left) * invRL;
+        result.m13 = -(top + bottom) * invTB;
+        result.m23 = -(zFar + zNear) * invFN;
+        result.m33 = 1f;
+        
+        
+    }
+    
 
     public static Matrix4f rotationFromQuaternion(Quaternion q) {
         if (Math.abs(q.w) > 1.0f) {

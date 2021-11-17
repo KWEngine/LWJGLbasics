@@ -1,12 +1,12 @@
 package de.openglapp.shaderprogram;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.lwjgl.opengl.GL45;
+import org.lwjgl.util.vector.Matrix4f;
 
+import de.openglapp.geometry.Rectangle;
+import de.openglapp.helper.HelperMatrix;
 import de.openglapp.helper.HelperShader;
+import de.openglapp.helper.HelperTexture;
 import de.openglapp.scene.GameObject;
 import de.openglapp.scene.Scene;
 
@@ -17,6 +17,9 @@ public final class ShaderProgramMain {
 	
 	private static int _uniformModelViewProjectionMatrix = -1;
 	private static int _uniformColor = -1;
+	private static int _uniformTexture = -1;
+	
+	private static Matrix4f _currentMVP = new Matrix4f();
 	
 	public static void init()
 	{
@@ -30,7 +33,8 @@ public final class ShaderProgramMain {
 		GL45.glLinkProgram(_programId);
 		
 		_uniformModelViewProjectionMatrix = GL45.glGetUniformLocation(_programId, "uModelViewProjectionMatrix");
-		_uniformColor = GL45.glGetUniformLocation(_programId, "uModelViewProjectionMatrix");
+		_uniformColor = GL45.glGetUniformLocation(_programId, "uColor");
+		_uniformTexture = GL45.glGetUniformLocation(_programId,"uTexture");
 	}
 	
 	public static int getProgramId()
@@ -48,9 +52,45 @@ public final class ShaderProgramMain {
 		GL45.glUseProgram(0);
 	}
 	
-	public static void render(Scene s)
+	public static void render(Scene s, Matrix4f viewProjectionMatrix)
 	{
-		//GL45.
+		for(GameObject g : s.getObjects())
+		{
+			renderGameObject(g, viewProjectionMatrix);
+		}
 	
+	}
+	
+	private static void renderGameObject(GameObject g, Matrix4f viewProjectionMatrix)
+	{
+		// Transmit white as tint color:
+		GL45.glUniform3f(_uniformColor, 1f, 1f, 1f);
+		
+		// Get model matrix (containing position, rotation and scale for current instance):
+		Matrix4f modelMatrix = g.getModelMatrix();
+		
+		// Build the model-view-projection matrix by multiplying the 
+		// modelMatrix with the view-projection matrix:
+		Matrix4f.mul(modelMatrix, viewProjectionMatrix, _currentMVP);
+		
+		// Upload model-view-projection matrix to GPU:
+		float[] mvpAsArray = HelperMatrix.asFloatArray(_currentMVP);
+		GL45.glUniformMatrix4fv(_uniformModelViewProjectionMatrix, false, mvpAsArray);
+		
+		// Upload texture to GPU:
+		GL45.glActiveTexture(GL45.GL_TEXTURE0);
+		GL45.glBindTexture(GL45.GL_TEXTURE_2D, 0);
+		//GL45.glUniform1i(_uniformTexture, g.GetTexture());
+		GL45.glUniform1i(_uniformTexture, HelperTexture.GetDefaultWhiteTexture());
+		
+		GL45.glBindVertexArray(Rectangle.getVAO());
+		
+		// Tell GPU to draw the rectangle:
+		GL45.glDrawArrays(GL45.GL_TRIANGLES, 0, 6); // 2 triangles = 2 x 3 vertices = 6 vertices total
+		
+		GL45.glBindVertexArray(0);
+		
+		// unbind texture from GPU memory:
+		GL45.glBindTexture(GL45.GL_TEXTURE_2D, 0);
 	}
 }

@@ -17,6 +17,11 @@ public class Scene {
 		HelperMatrix.lookAt(camPosX, camPosY, camPosZ, camTargetX, camTargetY, camTargetZ, _viewMatrix);
 	}
 	
+	public void updateProjectionMatrix(int width, int height)
+	{
+		HelperMatrix.updateOrthographicProjectionMatrix(0, width, height, 0, 0.1f, 1000f, _projectionMatrix);
+	}
+	
 	public void addObject(GameObject g)
 	{
 		_objectList.add(g);
@@ -25,5 +30,10 @@ public class Scene {
 	public ArrayList<GameObject> getObjects()
 	{
 		return _objectList;
+	}
+	
+	public void updateViewProjectionMatrix(Matrix4f vpMatrix)
+	{
+		HelperMatrix.multiply(_viewMatrix, _projectionMatrix, vpMatrix);
 	}
 }

@@ -23,6 +23,11 @@ public class HelperTexture {
 		_textureWhiteDefault = importTexture("/textures/white.png");
 	}
 	
+	public static int GetDefaultWhiteTexture()
+	{
+		return _textureWhiteDefault;
+	}
+	
 	public static int importTexture(String filename)
 	{
         
@@ -39,23 +44,21 @@ public class HelperTexture {
             //String userDir = System.getProperty("user.dir");
             int bytesPerPixel = 0;
             Graphics2D g = null;
+            InputStream is = null;
             try {
-            	InputStream is = HelperTexture.class.getResourceAsStream(filename);
+            	is = HelperTexture.class.getResourceAsStream(filename);
                 //image = ImageIO.read(new File(filename));
             	image = ImageIO.read(is);
                 bytesPerPixel = image.getColorModel().hasAlpha() ? 4 : 3;
                 g = image.createGraphics();
                 g.drawImage(image, 0, 0, null);
                 is.close();
+                
             } catch (Exception ex) {
                 System.err.println("Could not load file '" + filename + "'. Is your path correct?");
                 return _textureWhiteDefault;
             }
-            finally {
-            	if(g != null)
-            		g.dispose();
-            }
-
+            
             int[] pixels = new int[image.getWidth() * image.getHeight()];
             image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
             ByteBuffer buffer = BufferUtils.createByteBuffer(
@@ -69,16 +72,16 @@ public class HelperTexture {
                     buffer.put((byte) (pixel & 0xFF));               // Blue component
                     if (bytesPerPixel == 4) {
                         buffer.put((byte) ((pixel >> 24) & 0xFF));    // Alpha component. Only for RGBA
+                        //System.out.println((int) ((pixel >> 24) & 0xFF));
                     } else {
                         buffer.put((byte) 0xFF);
+                        //System.out.println((int)0xFF);
                     }
                 }
             }
 
             buffer.flip();
-            int textures[] = new int[1];
-            GL45.glGenTextures(textures);
-            textureID = textures[0];
+            textureID = GL45.glGenTextures();
             GL45.glBindTexture(GL45.GL_TEXTURE_2D, textureID); //Bind texture ID
 
             GL45.glTexImage2D(GL45.GL_TEXTURE_2D, 0, GL45.GL_RGBA, image.getWidth(), image.getHeight(), 0, GL45.GL_RGBA, GL45.GL_UNSIGNED_BYTE, buffer);
@@ -93,6 +96,10 @@ public class HelperTexture {
 
             _textureList.put(filename, textureID);
 
+            if(g != null)
+            {
+            	g.dispose();
+            }
             
             
             // unbind texture
