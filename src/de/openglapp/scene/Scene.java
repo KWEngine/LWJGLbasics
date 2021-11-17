@@ -20,6 +20,7 @@ public class Scene {
 	public void updateProjectionMatrix(int width, int height)
 	{
 		HelperMatrix.updateOrthographicProjectionMatrix(0, width, height, 0, 0.1f, 1000f, _projectionMatrix);
+		//HelperMatrix.perspective((float)Math.PI / 4, width / (float)height, 0.1f, 1000f, _projectionMatrix);
 	}
 	
 	public void addObject(GameObject g)

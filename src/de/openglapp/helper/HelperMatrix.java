@@ -18,16 +18,17 @@ public final class HelperMatrix {
     private final static Matrix4f mTrans = new Matrix4f();
     private final static Vector3f mWorldUp = new Vector3f(0, 1, 0);
     private final static float[] mMatrix4AsFloats = new float[16];
+    private final static FloatBuffer mFloatBuffer = BufferUtils.createFloatBuffer(16);
     
 	public static FloatBuffer genFBuffer(Matrix4f m) {
-        FloatBuffer result = BufferUtils.createFloatBuffer(16);
-        m.store(result);
-        result.flip();
-        return result;
+		m.store(mFloatBuffer);
+		mFloatBuffer.flip();
+        return mFloatBuffer;
     }
 	
 	public static float[] asFloatArray(Matrix4f m)
 	{
+		/*
 		mMatrix4AsFloats[0] = m.m00;
 		mMatrix4AsFloats[1] = m.m10;
 		mMatrix4AsFloats[2] = m.m20;
@@ -47,7 +48,7 @@ public final class HelperMatrix {
 		mMatrix4AsFloats[13] = m.m13;
 		mMatrix4AsFloats[14] = m.m23;
 		mMatrix4AsFloats[15] = m.m33;
-		/*
+		*/
 		// new try:
 		mMatrix4AsFloats[0] = m.m00;
 		mMatrix4AsFloats[1] = m.m01;
@@ -68,7 +69,7 @@ public final class HelperMatrix {
 		mMatrix4AsFloats[13] = m.m31;
 		mMatrix4AsFloats[14] = m.m32;
 		mMatrix4AsFloats[15] = m.m33;
-		*/
+		
 		
 		return mMatrix4AsFloats;
 	}
@@ -175,9 +176,6 @@ public final class HelperMatrix {
     
     public static void updateOrthographicProjectionMatrix(int left, int right, int bottom, int top, float zNear, float zFar, Matrix4f result)
     {
-    	//return;
-    	
-    	
         float invRL = 1f / (right - left);
         float invTB = 1f / (top - bottom);
         float invFN = 1f / (zFar - zNear);
@@ -202,8 +200,6 @@ public final class HelperMatrix {
         result.m13 = -(top + bottom) * invTB;
         result.m23 = -(zFar + zNear) * invFN;
         result.m33 = 1f;
-        
-        
     }
     
 
@@ -389,31 +385,8 @@ public final class HelperMatrix {
         result.m23 = (((lM41 * rM13) + (lM42 * rM23)) + (lM43 * rM33)) + (lM44 * rM43);
         result.m33 = (((lM41 * rM14) + (lM42 * rM24)) + (lM43 * rM34)) + (lM44 * rM44);
     }
-
-    public static Matrix4f orthographic(float fovX, float fovY, float near, float far) {
-        Matrix4f result = new Matrix4f();
-        createOrthographicOffCenter(-fovX / 2, fovX / 2, -fovY / 2, fovY / 2, near, far, result);
-        return result;
-    }
-
-    private static void createOrthographicOffCenter(float left, float right, float bottom, float top, float near, float far, Matrix4f result) {
-
-        float invRL = 1 / (right - left);
-        float invTB = 1 / (top - bottom);
-        float invFN = 1 / (far - near);
-
-        result.m00 = 2 * invRL;
-        result.m11 = 2 * invTB;
-        result.m22 = -2 * invFN;
-
-        result.m03 = -(right + left) * invRL;
-        result.m13 = -(top + bottom) * invTB;
-        result.m23 = -(far + near) * invFN;
-        result.m33 = 1;
-    }
-
-    private static Matrix4f createPerspectiveOffCenter(float left, float right, float bottom, float top, float zNear, float zFar) {
-        Matrix4f result = new Matrix4f();
+    
+    private static void createPerspectiveOffCenter(float left, float right, float bottom, float top, float zNear, float zFar, Matrix4f result) {
 
         float x = (2.0f * zNear) / (right - left);
         float y = (2.0f * zNear) / (top - bottom);
@@ -440,22 +413,19 @@ public final class HelperMatrix {
         result.m13 = 0;
         result.m23 = d;
         result.m33 = 0;
-
-        return result;
     }
 
-    public static Matrix4f perspective(float fov, float widthHeightAspect, float near, float far) {
+    public static void perspective(float fov, float widthHeightAspect, float near, float far, Matrix4f result) {
         if (fov > 0 && fov <= Math.PI) {
             float yMax = near * (float) Math.tan(0.5f * fov);
             float yMin = -yMax;
             float xMin = yMin * widthHeightAspect;
             float xMax = yMax * widthHeightAspect;
-            return createPerspectiveOffCenter(xMin, xMax, yMin, yMax, near, far);
+            createPerspectiveOffCenter(xMin, xMax, yMin, yMax, near, far, result);
         }
-        return new Matrix4f();
     }
 
-    public static void lookAt(Vector3f eye, Vector3f target, Vector3f up, Matrix4f result) {
+    public static void updateViewMatrix(Vector3f eye, Vector3f target, Vector3f up, Matrix4f result) {
         Vector3f z = new Vector3f();
         Vector3f.sub(eye, target, z);
         z.normalise();
@@ -527,7 +497,10 @@ public final class HelperMatrix {
         mRot.m23 = 0;
         mRot.m33 = 1;
 
-        eye = HelperVector.mul(eye, -1);
+        eye.x = eye.x * -1;
+        eye.y = eye.y * -1;
+        eye.z = eye.z * -1;
+        
         createTranslation(eye, mTrans);
         multiply(mTrans, mRot, result);
     }

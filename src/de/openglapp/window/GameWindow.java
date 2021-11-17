@@ -133,11 +133,16 @@ public class GameWindow {
 	private void initBasicGLCommands()
 	{
 		// Set the clear color for every new frame:
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+		glEnable(GL45.GL_TEXTURE);
+		glEnable(GL45.GL_DEPTH_TEST);
 		
 		// Disable rendering of back side faces:
 		glEnable(GL45.GL_CULL_FACE);
 		glCullFace(GL45.GL_BACK);
+		glFrontFace(GL45.GL_CW); //usually it's CCW, but with orthographic projection it's CW (in this specific case)
+		
+		GL45.glViewport(0,  0, windowWidth, windowHeight);
 		
 		ShaderProgramMain.init();
 		ShaderProgramMain.bindProgram();
@@ -156,8 +161,8 @@ public class GameWindow {
 		s.updateViewProjectionMatrix(_viewProjectionMatrix);
 		
 		GameObject exampleObject = new GameObject();
-		exampleObject.setPosition(1, 0,  0);
-		exampleObject.setScale(1,  1,  1);
+		exampleObject.setPosition(256, 256,  0);
+		exampleObject.setScale(512, 512,  1);
 		exampleObject.updateModelMatrix();
 		exampleObject.SetTexture("/textures/stone.jpg");
 		

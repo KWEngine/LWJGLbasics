@@ -1,5 +1,7 @@
 package de.openglapp.shaderprogram;
 
+import java.nio.FloatBuffer;
+
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.util.vector.Matrix4f;
 
@@ -74,14 +76,13 @@ public final class ShaderProgramMain {
 		Matrix4f.mul(modelMatrix, viewProjectionMatrix, _currentMVP);
 		
 		// Upload model-view-projection matrix to GPU:
-		float[] mvpAsArray = HelperMatrix.asFloatArray(_currentMVP);
-		GL45.glUniformMatrix4fv(_uniformModelViewProjectionMatrix, false, mvpAsArray);
+		FloatBuffer mvpAsFloatBuffer = HelperMatrix.genFBuffer(_currentMVP);
+		GL45.glUniformMatrix4fv(_uniformModelViewProjectionMatrix, true, mvpAsFloatBuffer);
 		
 		// Upload texture to GPU:
 		GL45.glActiveTexture(GL45.GL_TEXTURE0);
-		GL45.glBindTexture(GL45.GL_TEXTURE_2D, 0);
-		//GL45.glUniform1i(_uniformTexture, g.GetTexture());
-		GL45.glUniform1i(_uniformTexture, HelperTexture.GetDefaultWhiteTexture());
+		GL45.glBindTexture(GL45.GL_TEXTURE_2D, g.GetTexture());		
+		GL45.glUniform1i(_uniformTexture, 0);
 		
 		GL45.glBindVertexArray(Rectangle.getVAO());
 		
