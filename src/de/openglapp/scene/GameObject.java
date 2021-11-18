@@ -16,6 +16,10 @@ public class GameObject {
 	private Matrix4f _modelMatrix = new Matrix4f();
 	
 	
+	// Da am Ende nicht die einzelnen Daten (Position, etc.) des Objekts
+	// an die GPU übergeben werden, sondern alle Daten in eine 4x4-Matrix
+	// gepackt werden, muss man diese Matrix nach jeder Änderung am Objekt
+	// aktualisieren:
 	public void updateModelMatrix()
 	{
 		HelperMatrix.updateModelMatrix(_scale, _rotation, _position, _modelMatrix);
@@ -35,9 +39,11 @@ public class GameObject {
 	
 	public void setScale(float x, float y, float z)
 	{
+		// Hier müsste man noch Skalierungswerte <= 0 abfangen!
+		// Alle Werte müssen > 0 sein! ZWINGEND!
 		_scale.x = x;
 		_scale.y = y;
-		_scale.z = z; // in 2D, z SHOULD be 1 every time!
+		_scale.z = z;
 	}
 	
 	public void SetTexture(String filename)

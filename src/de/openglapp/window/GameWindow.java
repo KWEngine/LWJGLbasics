@@ -77,20 +77,20 @@ public class GameWindow {
 				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
 		});
 
-		// Get the thread stack and push a new frame
+		// Interne Speicherallokation für das Win32-Fenster:
 		try ( MemoryStack stack = stackPush() ) {
 			IntBuffer pWidth = stack.mallocInt(1); // int*
 			IntBuffer pHeight = stack.mallocInt(1); // int*
 
-			// Get the window size passed to glfwCreateWindow
+			// Auflösung des Fensters erfragen:
 			glfwGetWindowSize(window, pWidth, pHeight);
 			windowWidth = pWidth.get(0);
 			windowHeight = pHeight.get(0);
 
-			// Get the resolution of the primary monitor
+			// Monitorauflösung erfragen:
 			GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-			// Center the window
+			// Fenster auf dem Bildschirm zentrieren:
 			glfwSetWindowPos(
 				window,
 				(vidmode.width() - pWidth.get(0)) / 2,
@@ -98,12 +98,15 @@ public class GameWindow {
 			);
 		} // the stack frame is popped automatically
 
-		// Make the OpenGL context current
+		// In der Regel gibt es in OpenGL nur einen 'Kontext',
+		// in dem Textur-IDs usw. gespeichert werden. Dieser
+		// wird hier aktiviert:
 		glfwMakeContextCurrent(window);
-		// Enable v-sync
+		
+		// V-Sync aktivieren/deaktivieren:
 		glfwSwapInterval(1);
 
-		// Make the window visible
+		// Fenster sichtbar machen:
 		glfwShowWindow(window);
 	}
 
@@ -181,8 +184,8 @@ public class GameWindow {
 	private Scene initDemoScene()
 	{
 		Scene s = new Scene();
-		// Setze Kameraposition (und Ziel jeweils als x,y,z-Koordinaten:
-		s.updateViewMatrix(0, 0, 100, 0, 0, 0);
+		// Setze Kameraposition (und Ziel jeweils als x,y,z-Koordinaten):
+		s.updateViewMatrix(3, 3, 3, 0, 0, 0);
 		
 		// Aktualisiere die Projektionsmatrix der Szene:
 		s.updateProjectionMatrix(windowWidth, windowHeight);
@@ -194,7 +197,7 @@ public class GameWindow {
 		
 		GameObject exampleObject = new GameObject();
 		exampleObject.setPosition(0, 0,  0);
-		exampleObject.setScale(5, 5,  1);
+		exampleObject.setScale(1, 1, 1);
 		exampleObject.updateModelMatrix();
 		exampleObject.SetTexture("/textures/stone.jpg");
 		
