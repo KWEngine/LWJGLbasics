@@ -346,4 +346,11 @@ public class HelperVector {
         result.z = Vector3f.dot(source, new Vector3f(tmpMatrix.m02, tmpMatrix.m12, tmpMatrix.m22));
         return result;
     }
+    
+    public static Vector3f sub(Vector3f a, Vector3f b)
+    {
+    	Vector3f result = new Vector3f();
+    	Vector3f.sub(a, b, result);
+    	return result;
+    }
 }
