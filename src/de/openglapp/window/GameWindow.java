@@ -6,7 +6,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 import org.lwjgl.util.vector.Matrix4f;
 
-import de.openglapp.geometry.Rectangle;
+import de.openglapp.geometry.Cube;
 import de.openglapp.helper.HelperTexture;
 import de.openglapp.scene.GameObject;
 import de.openglapp.scene.Scene;
@@ -25,6 +25,9 @@ public class GameWindow {
 	private long window;
 	private int windowWidth;
 	private int windowHeight;
+	
+	// Die View-Projection-Matrix beinhaltet Kameraposition
+	// und Bildschirmseitenverhältnis in einer 4x4-Tabelle:
 	private Matrix4f _viewProjectionMatrix = new Matrix4f();
 	
 	public static void main(String[] args) {
@@ -32,16 +35,17 @@ public class GameWindow {
 	}
 	
 	public void run() {
-		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+		System.out.println("Starting LWJGL " + Version.getVersion() + "...");
 
+		// Initialisiere GLFW und OpenGL:
 		init();
+		
+		// Start den Game-Loop:
 		loop();
 
-		// Free the window callbacks and destroy the window
+		// Aufräumen:
 		glfwFreeCallbacks(window);
 		glfwDestroyWindow(window);
-
-		// Terminate GLFW and free the error callback
 		glfwTerminate();
 		glfwSetErrorCallback(null).free();
 	}
@@ -104,51 +108,72 @@ public class GameWindow {
 	}
 
 	private void loop() {
+		// Erstelle eine interne Liste der von der aktuellen GPU unterstützten
+		// OpenGL-Features:
 		GL.createCapabilities();
 
+		// Lege grundlegende Eigenschaften für OpenGL fest:
 		initBasicGLCommands();
+		
+		// Erstelle eine Demoszene mit einem GameObject:
 		Scene s = initDemoScene();
 		
-		// Run the rendering loop until the user has attempted to close
-		// the window or has pressed the ESCAPE key.
+		// Endlosschleife, bis ESCAPE gedrückt wird:
 		while ( !glfwWindowShouldClose(window) ) {
 			
-			// clear the framebuffer (screen)
+			// Lösche die Inhalte des Bildschirms, damit das neue
+			// Bild gezeichnet werden kann:
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
+			// Übergib das Szenen-Objekt an die render-Methode des Shader-Programms:
 			ShaderProgramMain.render(s, _viewProjectionMatrix);
 			
-			
-			
-			
-			// mark the current frame as 'done':
+			// Nach dem Rendern wird die gerenderte Szene an den Monitor gesendet:
 			glfwSwapBuffers(window);
 
-			// Poll for window events. The key callback above will only be
-			// invoked during this call.
+			// Horche auf Tastenanschläge: 
 			glfwPollEvents();
 		}
 	}
 	
 	private void initBasicGLCommands()
 	{
-		// Set the clear color for every new frame:
-		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+		// Setze die "Löschfarbe", mit der das letzte gerenderte Bild überschrieben wird:
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		
+		// Aktiviere Textureinheiten:
+		// (sollte eigentlich bei modernem OpenGL nicht mehr nötig sein)
 		glEnable(GL45.GL_TEXTURE);
+		
+		// Aktiviere den Tiefenpuffer, der sich merkt,
+		// wie weit ein Objekt von der Kamera entfernt ist:
 		glEnable(GL45.GL_DEPTH_TEST);
 		
-		// Disable rendering of back side faces:
+		// Erlaube 'back-face-culling':
+		// Wenn aktiv, werden Rückseiten von Objekten nicht
+		// mehr gerendert, weil sie von der Kamera eh nicht 
+		// gesehen werden:
 		glEnable(GL45.GL_CULL_FACE);
 		glCullFace(GL45.GL_BACK);
-		glFrontFace(GL45.GL_CW); //usually it's CCW, but with orthographic projection it's CW (in this specific case)
 		
+		// Normalerweise sind Eckpunkt von 3D-Modellen immer 
+		// gegen den Uhrzeigersinn (counter-clock-wise) arrangiert:
+		// (ACHTUNG: für orthogonale Projektion muss dies auf CW gestellt werden!!)
+		glFrontFace(GL45.GL_CCW);
+		
+		// Gleiche den OpenGL-internen Bildschirmausschnitt an die Fenstergröße an:
 		GL45.glViewport(0,  0, windowWidth, windowHeight);
 		
+		// Lade den Shader-Code und kompiliere und linke ihn:
 		ShaderProgramMain.init();
+		
+		// Teile OpenGL mit, dass dieses Programm ab jetzt benutzt werden soll:
 		ShaderProgramMain.bindProgram();
 		
-		Rectangle.init();
+		// Initialisiere einen simplen Würfel:
+		Cube.init();
 		
+		// Initialisiere eine weiße Standardtextur (als Backup-Lösung):
 		HelperTexture.initDefaultTexture();
 		
 	}
@@ -156,13 +181,20 @@ public class GameWindow {
 	private Scene initDemoScene()
 	{
 		Scene s = new Scene();
-		s.updateViewMatrix(0, 0, 1, 0, 0, 0);
+		// Setze Kameraposition (und Ziel jeweils als x,y,z-Koordinaten:
+		s.updateViewMatrix(0, 0, 100, 0, 0, 0);
+		
+		// Aktualisiere die Projektionsmatrix der Szene:
 		s.updateProjectionMatrix(windowWidth, windowHeight);
+		
+		// Erstelle aus der View-Matrix (Kameraposition) und der 
+		// Projektionsmatrix (Bildschirmseitenverhältnis)
+		// die kombinierte View-Projection-Matrix:
 		s.updateViewProjectionMatrix(_viewProjectionMatrix);
 		
 		GameObject exampleObject = new GameObject();
-		exampleObject.setPosition(256, 256,  0);
-		exampleObject.setScale(512, 512,  1);
+		exampleObject.setPosition(0, 0,  0);
+		exampleObject.setScale(5, 5,  1);
 		exampleObject.updateModelMatrix();
 		exampleObject.SetTexture("/textures/stone.jpg");
 		

@@ -19,8 +19,13 @@ public class Scene {
 	
 	public void updateProjectionMatrix(int width, int height)
 	{
-		HelperMatrix.updateOrthographicProjectionMatrix(0, width, height, 0, 0.1f, 1000f, _projectionMatrix);
-		//HelperMatrix.perspective((float)Math.PI / 4, width / (float)height, 0.1f, 1000f, _projectionMatrix);
+		// Diese Zeile einkommentieren, wenn eine strikte 2D-Ansicht gewünscht ist.
+		// Dort ist dann jede Weltkoordinate = Pixelkoordinate.
+		//HelperMatrix.updateOrthographicProjectionMatrix(0, width, height, 0, 0.1f, 1000f, _projectionMatrix);
+		
+		// Diese Zeile setzt die Projection-Matrix so, dass ein FOV von 90° gesetzt wird:
+		// (Math.PI / 4 = 90°)
+		HelperMatrix.perspective((float)Math.PI / 4, width / (float)height, 0.1f, 1000f, _projectionMatrix);
 	}
 	
 	public void addObject(GameObject g)
@@ -35,6 +40,9 @@ public class Scene {
 	
 	public void updateViewProjectionMatrix(Matrix4f vpMatrix)
 	{
+		// Die View-Projection-Matrix kombiniert die Infos aus View-Matrix (Kamera)
+		// und Projection-Matrix (Bildschirmauflösung, usw.) in einer einzigen
+		// Matrix:
 		HelperMatrix.multiply(_viewMatrix, _projectionMatrix, vpMatrix);
 	}
 }

@@ -5,10 +5,9 @@ import java.nio.FloatBuffer;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.util.vector.Matrix4f;
 
-import de.openglapp.geometry.Rectangle;
+import de.openglapp.geometry.Cube;
 import de.openglapp.helper.HelperMatrix;
 import de.openglapp.helper.HelperShader;
-import de.openglapp.helper.HelperTexture;
 import de.openglapp.scene.GameObject;
 import de.openglapp.scene.Scene;
 
@@ -84,7 +83,7 @@ public final class ShaderProgramMain {
 		GL45.glBindTexture(GL45.GL_TEXTURE_2D, g.GetTexture());		
 		GL45.glUniform1i(_uniformTexture, 0);
 		
-		GL45.glBindVertexArray(Rectangle.getVAO());
+		GL45.glBindVertexArray(Cube.getVAO());
 		
 		// Tell GPU to draw the rectangle:
 		GL45.glDrawArrays(GL45.GL_TRIANGLES, 0, 6); // 2 triangles = 2 x 3 vertices = 6 vertices total
