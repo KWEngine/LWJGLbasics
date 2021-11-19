@@ -8,21 +8,42 @@ public class Hitbox {
 	private static final Vector3f _tempVector = new Vector3f();
 	private static final Matrix4f _normalMatrix = new Matrix4f();
 
-	private final Vector3f[] STATICVERTICES = new Vector3f[] { new Vector3f(-0.5f, -0.5f, +0.5f),
-			new Vector3f(+0.5f, -0.5f, +0.5f), new Vector3f(+0.5f, -0.5f, -0.5f), new Vector3f(-0.5f, -0.5f, -0.5f),
+	private final Vector3f[] BASEVERTICES = new Vector3f[] { 
+			new Vector3f(-0.5f, -0.5f, +0.5f),
+			new Vector3f(+0.5f, -0.5f, +0.5f), 
+			new Vector3f(+0.5f, -0.5f, -0.5f), 
+			new Vector3f(-0.5f, -0.5f, -0.5f),
+			new Vector3f(+0.5f, +0.5f, +0.5f), 
+			new Vector3f(-0.5f, +0.5f, +0.5f), 
+			new Vector3f(-0.5f, +0.5f, -0.5f),
+			new Vector3f(+0.5f, +0.5f, -0.5f) 
+			};
 
-			new Vector3f(+0.5f, +0.5f, +0.5f), new Vector3f(-0.5f, +0.5f, +0.5f), new Vector3f(-0.5f, +0.5f, -0.5f),
-			new Vector3f(+0.5f, +0.5f, -0.5f) };
+	private final Vector3f[] BASENORMALS = new Vector3f[] { 
+			new Vector3f(1, 0, 0), 
+			new Vector3f(0, 1, 0),
+			new Vector3f(0, 0, 1) 
+			};
 
-	private final Vector3f[] STATICNORMALS = new Vector3f[] { new Vector3f(1, 0, 0), new Vector3f(0, 1, 0),
-			new Vector3f(0, 0, 1) };
-
-	private final Vector3f STATICCENTER = new Vector3f(0, 0, 0);
+	private final Vector3f BASECENTER = new Vector3f(0, 0, 0);
 
 	private Vector3f[] _vertices = new Vector3f[8];
 	private Vector3f[] _normals = new Vector3f[3];
 	private Vector3f _center = new Vector3f(0, 0, 0);
 
+	public Hitbox()
+	{
+		// Fülle alle Eckpunkte der Hitbox einmalig mit (0|0|0):
+		for(int i = 0; i < _vertices.length; i++)
+		{
+			if(i < _normals.length)
+			{
+				_normals[i] = new Vector3f(0,0,0);
+			}
+			_vertices[i] = new Vector3f(0,0,0);
+		}
+	}
+	
 	public void update(Matrix4f modelMatrix) {
 
 		// Um die Normal-Matrix zu berechnen, transponiert man
@@ -35,13 +56,13 @@ public class Hitbox {
 			if (i < 3) {
 				// transform the normals by multiplying them by the normal matrix:
 				// (Hint: you may use the modelMatrix here as well)
-				transformNormal(STATICNORMALS[i], _normalMatrix, _normals[i]);
+				transformNormal(BASENORMALS[i], _normalMatrix, _normals[i]);
 			}
 			// transform the corner points by multiplying them by the model matrix:
-			transformPosition(STATICVERTICES[i], modelMatrix, _vertices[i]);
+			transformPosition(BASEVERTICES[i], modelMatrix, _vertices[i]);
 		}
 		// transform the center point by multiplying it by the model matrix:
-		transformPosition(STATICCENTER, modelMatrix, _center);
+		transformPosition(BASECENTER, modelMatrix, _center);
 	}
 
 	public static boolean doCollisionTest(Hitbox a, Hitbox b, Vector3f mtv) {

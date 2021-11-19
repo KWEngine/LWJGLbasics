@@ -16,6 +16,10 @@ public class HelperVector {
     private final static Vector4f temp4 = new Vector4f();
     private final static Quaternion qtemp = new Quaternion(0, 0, 0, 1);
     
+    public static final Vector3f UNITX = new Vector3f(1, 0, 0);
+    public static final Vector3f UNITY = new Vector3f(0, 1, 0);
+    public static final Vector3f UNITZ = new Vector3f(0, 0, 1);
+    
     private static Vector3f temp = new Vector3f();
 	
 	public static void mul(Vector3f vec, float scalar, Vector3f dest){
@@ -117,16 +121,18 @@ public class HelperVector {
     }
 
     public static Quaternion fromAxisAngle(float angle, Vector3f axis) {
-        Quaternion result = new Quaternion(0, 0, 0, 1);
+        qtemp.x = 0; qtemp.y = 0; qtemp.z = 0; qtemp.w = 1;
         angle *= 0.5f;
-        axis.normalise(axis);
-        Vector3f tmp = mul(axis, (float) Math.sin(angle));
-        result.x = tmp.x;
-        result.y = tmp.y;
-        result.z = tmp.z;
-        result.w = (float) Math.cos(angle);
-        result.normalise(result);
-        return result;
+        //axis.normalise(axis);
+        float tmpx = axis.x * (float) Math.sin(angle);
+        float tmpy = axis.y * (float) Math.sin(angle);
+        float tmpz = axis.z * (float) Math.sin(angle);
+        qtemp.x = tmpx;
+        qtemp.y = tmpy;
+        qtemp.z = tmpz;
+        qtemp.w = (float) Math.cos(angle);
+        qtemp.normalise(qtemp);
+        return qtemp;
     }
 
     public static void fromAxisAngle(Vector3f eulerAngles, Quaternion dest) {
