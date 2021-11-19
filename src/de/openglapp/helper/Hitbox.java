@@ -6,7 +6,10 @@ public class Hitbox {
 
 	private static final Matrix4f _tempMatrix = new Matrix4f();
 	private static final Vector3f _tempVector = new Vector3f();
+	private static final Vector4f _tempVector4 = new Vector4f();
+	private static final Vector4f _tempVector4result = new Vector4f();
 	private static final Matrix4f _normalMatrix = new Matrix4f();
+	
 
 	private final Vector3f[] BASEVERTICES = new Vector3f[] { 
 			new Vector3f(-0.5f, -0.5f, +0.5f),
@@ -66,15 +69,15 @@ public class Hitbox {
 	}
 
 	public static boolean doCollisionTest(Hitbox a, Hitbox b, Vector3f mtv) {
-		float mtvDistance = Float.MAX_VALUE;
 		float mtvDirection = 1;
+		float[] mtvDistance = new float[] {Float.POSITIVE_INFINITY};
 		mtv.x = 0;
 		mtv.y = 0;
 		mtv.z = 0;
 
 		Vector2f shape1MinMax;// = new Vector2f();
 		Vector2f shape2MinMax;// = new Vector2f();
-
+		
 		for (int i = 0; i < 3; i++) {
 			shape1MinMax = satTest(a._normals[i], a._vertices);
 			shape2MinMax = satTest(a._normals[i], b._vertices);
@@ -104,7 +107,7 @@ public class Hitbox {
 	}
 
 	private static boolean calculateOverlap(Vector3f axis, float shape1Min, float shape1Max, float shape2Min,
-			float shape2Max, float mtvDistance, Vector3f mtv, float mtvDirection, Vector3f posA, Vector3f posB) {
+			float shape2Max, float[] mtvDistance, Vector3f mtv, float mtvDirection, Vector3f posA, Vector3f posB) {
 		float intersectionDepthScaled;
 		if (shape1Min < shape2Min) {
 			if (shape1Max > shape2Max) {
@@ -138,8 +141,8 @@ public class Hitbox {
 		}
 		float intersectionDepthSquared = (intersectionDepthScaled * intersectionDepthScaled) / axisLengthSquared;
 
-		if (intersectionDepthSquared < mtvDistance || mtvDistance < 0) {
-			mtvDistance = intersectionDepthSquared;
+		if (intersectionDepthSquared < mtvDistance[0] || mtvDistance[0] < 0) {
+			mtvDistance[0] = intersectionDepthSquared;
 			HelperVector.mul(axis, intersectionDepthScaled / axisLengthSquared, mtv);
 			float notSameDirection = Vector3f.dot(HelperVector.sub(posA, posB), mtv);
 			mtvDirection = notSameDirection < 0 ? -1.0f : 1.0f;
@@ -152,8 +155,8 @@ public class Hitbox {
 	private static Vector2f satTest(Vector3f axisToTest, Vector3f[] points) {
 		Vector2f result = new Vector2f();
 
-		float minAlong = Float.MAX_VALUE;
-		float maxAlong = Float.MIN_VALUE;
+		float minAlong = Float.POSITIVE_INFINITY;
+		float maxAlong = Float.NEGATIVE_INFINITY;
 		for (int i = 0; i < points.length; i++) {
 			float dotVal = Vector3f.dot(points[i], axisToTest);
 			if (dotVal < minAlong)
@@ -192,6 +195,8 @@ public class Hitbox {
 		_tempVector.y = _tempMatrix.m12;
 		_tempVector.z = _tempMatrix.m22;
 		result.z = Vector3f.dot(src, _tempVector);
+		
+		result.normalise(result);
 	}
 
 	private static void transformPosition(Vector3f src, Matrix4f matrix, Vector3f result) {
@@ -202,7 +207,7 @@ public class Hitbox {
 
 		_tempVector.x = matrix.m10;
 		_tempVector.y = matrix.m11;
-		_tempVector.z = matrix.m22;
+		_tempVector.z = matrix.m12;
 		result.y = Vector3f.dot(src, _tempVector) + matrix.m13;
 
 		_tempVector.x = matrix.m20;

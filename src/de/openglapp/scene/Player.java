@@ -16,14 +16,20 @@ public class Player extends GameObject{
 		if(GameWindow.CURRENTWINDOW.isKeyDown("A"))
 			moveOffset(-0.1f, 0, 0);
 		if(GameWindow.CURRENTWINDOW.isKeyDown("W"))
-			moveOffset(0, 0.1f, 0);
+			moveOffset(0, 0, -0.1f);
 		if(GameWindow.CURRENTWINDOW.isKeyDown("S"))
-			moveOffset(0, -0.1f, 0);
+			moveOffset(0, 0, 0.1f);
+		
 		
 		if(GameWindow.CURRENTWINDOW.isKeyDown("Q"))
+			moveOffset(0, -0.1f, 0);
+		if(GameWindow.CURRENTWINDOW.isKeyDown("E"))
+			moveOffset(0, 0.1f, 0);
+		
+		if(GameWindow.CURRENTWINDOW.isKeyDown("R"))
 			addRotationY(0.1f, true);
 		
-		if(GameWindow.CURRENTWINDOW.isKeyDown("E"))
+		if(GameWindow.CURRENTWINDOW.isKeyDown("T"))
 			addRotationY(-0.1f, true);
 		
 		updateModelMatrix();
@@ -32,6 +38,7 @@ public class Player extends GameObject{
 		for(Vector3f mtv : collisionList)
 		{
 			moveOffset(mtv);
+			updateModelMatrix();
 		}
 	}
 }

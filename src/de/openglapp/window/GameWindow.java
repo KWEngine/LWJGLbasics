@@ -197,7 +197,7 @@ public class GameWindow {
 	{
 		Scene s = new Scene();
 		// Setze Kameraposition (und Ziel jeweils als x,y,z-Koordinaten):
-		s.updateViewMatrix(3, 3, 3, 0, 0, 0);
+		s.updateViewMatrix(0, 5, 5, 0, 0, 0);
 		
 		// Aktualisiere die Projektionsmatrix der Szene:
 		s.updateProjectionMatrix(windowWidth, windowHeight);
@@ -208,15 +208,15 @@ public class GameWindow {
 		s.updateViewProjectionMatrix(_viewProjectionMatrix);
 		
 		Player playerObject = new Player();
-		playerObject.setPosition(-2, 0,  0);
-		playerObject.setScale(1, 1, 1);
+		playerObject.setPosition(1f, 0,  -2f);
+		playerObject.setScale(3, 1, 1);
 		playerObject.updateModelMatrix();
 		playerObject.SetTexture("/textures/stone.jpg");
 		s.addObject(playerObject);
 		
 		Obstacle obstacleObject = new Obstacle();
-		obstacleObject.setPosition(3, 0,  0);
-		obstacleObject.setScale(1, 1, 1);
+		obstacleObject.setPosition(2f, 0,  0);
+		obstacleObject.setScale(2, 1, 1);
 		obstacleObject.updateModelMatrix();
 		obstacleObject.SetTexture("/textures/wall.png");
 		s.addObject(obstacleObject);
