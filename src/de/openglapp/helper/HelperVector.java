@@ -13,6 +13,8 @@ public class HelperVector {
     private final static Vector3f yAxis = new Vector3f(0, 1, 0);
     private final static Vector3f zAxis = new Vector3f(0, 0, 1);
     private final static Matrix4f tmpMatrix = new Matrix4f();
+    private static final Matrix4f _tempMatrix = new Matrix4f();
+	private static final Vector3f _tempVector = new Vector3f();
     private final static Vector4f temp4 = new Vector4f();
     private final static Quaternion qtemp = new Quaternion(0, 0, 0, 1);
     
@@ -38,6 +40,14 @@ public class HelperVector {
         dest.z *= scalar;
     }
 
+    public static Vector3f tripleProduct(Vector3f a, Vector3f b, Vector3f c)
+    {
+    	Vector3f result = new Vector3f(0, 0, 0);
+    	Vector3f.cross(a,  b,  result);
+    	Vector3f.cross(result, c, result);
+    	return result;
+    }
+    
     public static void toAxisAngle(Quaternion src, Vector4f result) {
         Quaternion q = new Quaternion(src);
         //System.out.println("src: " + q.x + "; " + q.y + "; " + q.z + "; " + q.w);
@@ -359,4 +369,42 @@ public class HelperVector {
     	Vector3f.sub(a, b, result);
     	return result;
     }
+    
+    public static void transformNormal(Vector3f src, Matrix4f matrix, Vector3f result) {
+		Matrix4f.invert(matrix, _tempMatrix);
+
+		_tempVector.x = _tempMatrix.m00;
+		_tempVector.y = _tempMatrix.m10;
+		_tempVector.z = _tempMatrix.m20;
+		result.x = Vector3f.dot(src, _tempVector);
+
+		_tempVector.x = _tempMatrix.m01;
+		_tempVector.y = _tempMatrix.m11;
+		_tempVector.z = _tempMatrix.m21;
+		result.y = Vector3f.dot(src, _tempVector);
+
+		_tempVector.x = _tempMatrix.m02;
+		_tempVector.y = _tempMatrix.m12;
+		_tempVector.z = _tempMatrix.m22;
+		result.z = Vector3f.dot(src, _tempVector);
+		
+		result.normalise(result);
+	}
+
+	public static void transformPosition(Vector3f src, Matrix4f matrix, Vector3f result) {
+		_tempVector.x = matrix.m00;
+		_tempVector.y = matrix.m01;
+		_tempVector.z = matrix.m02;
+		result.x = Vector3f.dot(src, _tempVector) + matrix.m03;
+
+		_tempVector.x = matrix.m10;
+		_tempVector.y = matrix.m11;
+		_tempVector.z = matrix.m12;
+		result.y = Vector3f.dot(src, _tempVector) + matrix.m13;
+
+		_tempVector.x = matrix.m20;
+		_tempVector.y = matrix.m21;
+		_tempVector.z = matrix.m22;
+		result.z = Vector3f.dot(src, _tempVector) + matrix.m23;
+	}
 }

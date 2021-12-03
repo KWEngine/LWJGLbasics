@@ -5,7 +5,7 @@ import java.nio.FloatBuffer;
 import org.lwjgl.opengl.GL45;
 import org.lwjgl.util.vector.Matrix4f;
 
-import de.openglapp.geometry.Cube;
+import de.openglapp.geometry.*;
 import de.openglapp.helper.HelperMatrix;
 import de.openglapp.helper.HelperShader;
 import de.openglapp.scene.GameObject;
@@ -78,7 +78,7 @@ public final class ShaderProgramMain {
 	{
 		// Übertrage an die Speicheradresse für die Färbung
 		// die Farbe 100% rot, 100% grün und 100% blau:
-		GL45.glUniform3f(_uniformColor, 1f, 1f, 1f);
+		GL45.glUniform3f(_uniformColor, g.getColor().x, g.getColor().y, g.getColor().z);
 		
 		// Erfrage die Model-Matrix des aktuellen Objekts.
 		// Die Model-Matrix beinhaltet immer die aktuelle
@@ -101,10 +101,10 @@ public final class ShaderProgramMain {
 		GL45.glUniform1i(_uniformTexture, 0); // Sag der GPU, dass sie die Textur in Einheit 0 ablegen soll
 		
 		// Sende die Geometrie-Daten (z.B. des Würfels) an die GPU: 
-		GL45.glBindVertexArray(Cube.getVAO());
+		GL45.glBindVertexArray(Triangle.getVAO());
 		
 		// Sage der GPU, dass sie diese jetzt zeichnen soll:
-		GL45.glDrawArrays(GL45.GL_TRIANGLES, 0, Cube.getVertexCount());
+		GL45.glDrawArrays(GL45.GL_TRIANGLES, 0, Triangle.getVertexCount());
 		
 		// Verwirf die Geometrie-Daten:
 		GL45.glBindVertexArray(0);

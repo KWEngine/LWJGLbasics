@@ -7,6 +7,7 @@ import org.lwjgl.system.*;
 import org.lwjgl.util.vector.Matrix4f;
 
 import de.openglapp.geometry.Cube;
+import de.openglapp.geometry.Triangle;
 import de.openglapp.helper.HelperTexture;
 import de.openglapp.scene.GameObject;
 import de.openglapp.scene.Obstacle;
@@ -187,6 +188,7 @@ public class GameWindow {
 		
 		// Initialisiere einen simplen Würfel:
 		Cube.init();
+		Triangle.init();
 		
 		// Initialisiere eine weiße Standardtextur (als Backup-Lösung):
 		HelperTexture.initDefaultTexture();
@@ -197,7 +199,7 @@ public class GameWindow {
 	{
 		Scene s = new Scene();
 		// Setze Kameraposition (und Ziel jeweils als x,y,z-Koordinaten):
-		s.updateViewMatrix(0, 5, 5, 0, 0, 0);
+		s.updateViewMatrix(0, 0, 5, 0, 0, 0);
 		
 		// Aktualisiere die Projektionsmatrix der Szene:
 		s.updateProjectionMatrix(windowWidth, windowHeight);
@@ -208,15 +210,15 @@ public class GameWindow {
 		s.updateViewProjectionMatrix(_viewProjectionMatrix);
 		
 		Player playerObject = new Player();
-		playerObject.setPosition(1f, 0,  -2f);
-		playerObject.setScale(3, 1, 1);
+		playerObject.setPosition(-1f, 0,  0);
+		//playerObject.setScale(2, 2, 2);
 		playerObject.updateModelMatrix();
 		playerObject.SetTexture("/textures/stone.jpg");
 		s.addObject(playerObject);
 		
 		Obstacle obstacleObject = new Obstacle();
 		obstacleObject.setPosition(2f, 0,  0);
-		obstacleObject.setScale(2, 1, 1);
+		//obstacleObject.setScale(3, 3, 3);
 		obstacleObject.updateModelMatrix();
 		obstacleObject.SetTexture("/textures/wall.png");
 		s.addObject(obstacleObject);

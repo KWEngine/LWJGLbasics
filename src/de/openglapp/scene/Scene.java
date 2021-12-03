@@ -7,6 +7,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.openglapp.helper.HelperMatrix;
 import de.openglapp.helper.Hitbox;
+import de.openglapp.helper.HitboxGJK;
 
 public class Scene {
 	private ArrayList<GameObject> _objectList = new ArrayList<>();
@@ -61,7 +62,23 @@ public class Scene {
 				}
 			}
 		}
-
 		return vectorList;
+	}
+	
+	public ArrayList<GameObject> getCollisionsGJKFor(GameObject caller) {
+		ArrayList<GameObject> colliderList = new ArrayList<>();
+
+		for (GameObject g : getObjects()) {
+			if (g.equals(caller)) {
+				continue;
+			} else {
+				boolean hasCollision = HitboxGJK.doCollisionTest(caller.getHitboxGJK(), g.getHitboxGJK());
+				if(hasCollision)
+				{
+					colliderList.add(g);
+				}
+			}
+		}
+		return colliderList;
 	}
 }

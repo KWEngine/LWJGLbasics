@@ -2,11 +2,13 @@ package de.openglapp.scene;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import de.openglapp.geometry.Triangle;
 import de.openglapp.helper.HelperMath;
 import de.openglapp.helper.HelperMatrix;
 import de.openglapp.helper.HelperTexture;
 import de.openglapp.helper.HelperVector;
 import de.openglapp.helper.Hitbox;
+import de.openglapp.helper.HitboxGJK;
 
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Matrix4f;
@@ -17,12 +19,19 @@ public class GameObject {
 	private Vector3f _scale = new Vector3f(1,1,1);
 	private int _textureId = -1;
 	private Matrix4f _modelMatrix = new Matrix4f();
+	private Vector3f _color = new Vector3f(1,1,1);
 	
 	private Hitbox _hitbox = new Hitbox();
+	private HitboxGJK _hitboxGJK = new HitboxGJK(Triangle.VERTICES, Triangle.NORMALS, new float[] {0, 0, 0});
 	
 	public Hitbox getHitbox()
 	{
 		return _hitbox;
+	}
+	
+	public HitboxGJK getHitboxGJK()
+	{
+		return _hitboxGJK;
 	}
 	
 	// Da am Ende nicht die einzelnen Daten (Position, etc.) des Objekts
@@ -35,11 +44,24 @@ public class GameObject {
 		
 		// Wenn sich die Model-Matrix aktualisiert, aktualisiere auch die Hitbox:
 		_hitbox.update(_modelMatrix);
+		_hitboxGJK.update(_modelMatrix);
 	}
 	
 	public Matrix4f getModelMatrix()
 	{
 		return _modelMatrix;
+	}
+	
+	public void setColor(float r, float g, float b)
+	{
+		_color.x = HelperMath.clamp(r,  0,  1);
+		_color.y = HelperMath.clamp(g,  0,  1);
+		_color.z = HelperMath.clamp(b,  0,  1);
+	}
+	
+	public Vector3f getColor()
+	{
+		return _color;
 	}
 	
 	public void setPosition(float x, float y, float z)
