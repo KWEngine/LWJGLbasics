@@ -173,7 +173,8 @@ public class HitboxGJK {
 	
 	private static Vector3f support(HitboxGJK a, HitboxGJK b, Vector3f d)
 	{
-		Vector3f supportPoint = HelperVector.sub(a.furthestPoint(d), b.furthestPoint(d));
+		Vector3f invertedVector = HelperVector.mul(d, -1);
+		Vector3f supportPoint = HelperVector.sub(a.furthestPoint(d), b.furthestPoint(invertedVector));
 		
 		return supportPoint;
 	}
@@ -181,7 +182,7 @@ public class HitboxGJK {
 	private Vector3f furthestPoint(Vector3f d)
 	{
 		int furthestIndex = 0;
-		float currentMax = 0;
+		float currentMax = Float.NEGATIVE_INFINITY;
 		
 		for(int i = 0; i < _vertices.length; i++)
 		{
